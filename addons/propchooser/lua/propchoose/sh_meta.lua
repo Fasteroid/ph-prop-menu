@@ -32,6 +32,7 @@ if SERVER then
 		self:SetNWInt("CurrentUsage", PCR.CVAR.UseLimit:GetInt() or 0)
 	end
 
+	-- unused.
 	function Player:UsageAddCount()
 		local cur = self:CheckUsage()
 		self:SetNWInt("CurrentUsage", cur + 1)

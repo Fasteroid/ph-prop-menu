@@ -7,6 +7,10 @@ net.Receive("pcr.PropListData", function()
 	end
 end)
 
+timer.Create("pcrT.NotifyAddon", math.random(70,120), math.random(4,10), function()
+	chat.AddText( Color(10,235,235), "[Prop Chooser]", Color(220,220,220), " This server uses Prop Chooser version 1.2! Type ", Color(235,235,0), "\"!pcrhelp\"" , Color(220,220,220), " for more info!" )
+end)
+
 PCR.WindowControl = {}
 function PCR.WindowControl.MainFrame(ls)
 	if !PCR.CVAR.EnableFeature:GetBool() then
@@ -84,13 +88,9 @@ function PCR.WindowControl.MainFrame(ls)
 			icon:SetToolTip(p)
 			
 			icon.DoClick = function()
-				local xtr = "0"
-				if uselimit <= -1 then  xtr = "Unlimited" end
-				if uselimit > 0 then xtr = tostring(uselimit - 1) end
 				net.Start("pcr.SetMetheProp")
 				net.WriteString(p)
 				net.SendToServer()
-				notification.AddLegacy("[Prop Chooser] You have ".. xtr .." usage left!", NOTIFY_GENERIC, 5)
 				f.frame:Close()
 			end
 			f.grid:AddItem(pan)
@@ -119,7 +119,7 @@ function PCR.WindowControl.MainFrame(ls)
 			f.button:SetSize(140,24)
 			f.button:SetIcon("icon16/heart.png")
 			f.button.DoClick = function()
-				gui.OpenURL("https://www.wolvindra.net/donate/")
+				gui.OpenURL("https://www.wolvindra.net/donate")
 				f.frame:Close()
 			end
 		end
@@ -142,3 +142,28 @@ concommand.Add("phe_access_propchoose", PCR.AddProps)
 net.Receive("pcr.ShowUI", function()
 	PCR.AddProps()
 end)
+
+function PCR.openTutorialWindow()
+
+	local f = {}
+		
+	f.frame = vgui.Create("DFrame")
+	f.frame:SetPos(0,0)
+	f.frame:SetSize(970, 556)
+	f.frame:SetTitle("Prop Chooser - Quick Guide v.1.2")
+	f.frame:SetVisible(true)
+	f.frame:ShowCloseButton(true)
+	f.frame:SetMouseInputEnabled(true)
+	f.frame:SetKeyboardInputEnabled(true)
+	f.frame:Center()
+	
+	f.frame:SetDraggable(false)
+	
+	f.image = vgui.Create("DImage",f.frame)
+	f.image:SetImage("pcr/idbs_guide")
+	f.image:Dock(FILL)
+	
+	f.frame:MakePopup()
+	f.frame:SetKeyboardInputEnabled(false)
+	
+end

@@ -110,13 +110,22 @@ hook.Add("Initialize", "PCR.PopulateProps", function()
 	end)
 end)
 
+-- NOTE: If you made changes to server side code, Please do a map restart to take effect or force player to rejoin!
+-- These only adds once during player initial join.
 util.AddNetworkString("pcr.PropListData")
 hook.Add("PlayerInitialSpawn", "PCR.SendPropListData", function(ply)
 	timer.Simple(math.random(4,7), function()
 		net.Start("pcr.PropListData")
 			net.WriteUInt(#PCR.PropList, 32)
 			for i=1, #PCR.PropList do
+				-- I don't think I saw any map that have different models path that goes more than 1024.
+				-- uncomment these lines below if you want to *limit* the prop addition max to 1024 for Safety sake.
+				-- Maximum count can be 128, 256, 512, 1024, 2048. 256 and 512 is the safest range.
+				
+				-- if (i > 256) then
 				net.WriteString(PCR.PropList[i])
+				--    break
+				-- end
 			end
 		net.Send(ply)
 	end)
@@ -124,68 +133,118 @@ hook.Add("PlayerInitialSpawn", "PCR.SendPropListData", function(ply)
 	ply:SetNWInt("CurrentUsage", 0)
 end)
 
-util.AddNetworkString("pcr.ResetUseLimit")
 hook.Add("PostCleanupMap","PCR.ResetUseLimit",function()
 	for _,ply in pairs(player.GetAll()) do
 		ply:ResetUsage()
 	end
 end)
 
+PCR.NotifyPlayer = function( ply , message , kind )
+	ply:SendLua("notification.AddLegacy(\"".. message .. "\", " .. kind .. ", 5)")
+	ply:SendLua("surface.PlaySound('garrysmod/save_load".. math.random(1,4) ..".wav')")
+end
+
+local function PlayerDelayCheck(ply)
+	local lastUsedTime = ply:GetNWFloat("pcr.LastUsedTime")
+	local delayedTime = lastUsedTime + PCR.CVAR.DelayUsageTime:GetFloat()
+	local currentTime = CurTime()
+	
+	return delayedTime > currentTime; 
+end
+
 util.AddNetworkString("pcr.SetMetheProp")
-util.AddNetworkString("pcr.RevertUsage")
 net.Receive("pcr.SetMetheProp",function(len,ply)
 	local mdl = net.ReadString()
 	
-	if (!table.HasValue(PCR.PropList, mdl)) then
-		print("WARNING: User ".. ply:Nick() .." ("..ply:SteamID()..") is trying to use Invalid Prop Model : " .. mdl .. ", which DOES NOT EXIST in the map!")
-		ply:ChatPrint("That prop you have selected does not exists in the server map.")
+	-- if so, Warn / Kick player to maximum thresold if they are trying to access invalid model.
+	if (not table.HasValue(PCR.PropList, mdl)) then
+		if !ply.warnInvalidModel then
+			ply.warnInvalidModel = 0
+		end
+		
+		print("[Prop Chooser] !!WARNING: User ".. ply:Nick() .." ("..ply:SteamID()..") is trying to use Invalid Prop Model : " .. mdl .. ", which DOES NOT EXIST in the map!")
+		
+		if ( PCR.CVAR.KickInvalidModel:GetBool() ) then
+			ply.warnInvalidModel = ply.warnInvalidModel + 1
+			ply:ChatPrint("That prop you have selected does not exists in the server map. (" ..tostring(ply.warnInvalidModel).. "/4).")
+			if ply.warnInvalidModel > 4 then
+				ply:Kick("[Prop Chooser] Kicked for Reason: trying to access invalid prop.")
+			end
+		else
+			ply:ChatPrint("That prop you have selected does not exists in the server map.")
+		end
+		
 		return
 	end
 	
-	local pos = ply:GetPos()
-	--Temporarily Spawn a prop.
-	local ent = ents.Create("prop_physics")
-	ent:SetPos(Vector(pos.x,pos.y,pos.z-512))
-	ent:SetAngles(Angle(0,0,0))
-	ent:SetKeyValue("spawnflags","654")
-	ent:SetNoDraw(true)
-	ent:SetModel(mdl)
-	
-	ent:Spawn()
-	
-	local usage = ply:CheckUsage()
-	local hmx,hz = ent:GetPropSize()
-	if !ply:CheckHull(hmx,hmx,hz) then
-		if usage > 0 then
-			ply:SendLua([[chat.AddText(Color(235,10,15), "[Prop Chooser]", Color(220,220,220), " There is no room to change the prop. Move a little a bit...")]])
-		end
-	else
-		if usage <= -1 then
-			GAMEMODE:PlayerExchangeProp(ply,ent)
-		elseif usage > 0 then
-			ply:UsageSubstractCount()
-			GAMEMODE:PlayerExchangeProp(ply,ent)
-		end
+	-- Make sure that the player is On Ground and Not crouching.
+	if ( ply:Crouching() or (not ply:IsOnGround()) ) then
+		ply:ChatPrint("[Prop Chooser] You need to stay on the ground or not crouching!")
+		return
 	end
-	ent:Remove()
+	
+	if ( IsValid(ply) and (not PlayerDelayCheck(ply)) ) then
+	
+		if ply:CheckUsage() == 0 then
+			ply:ChatPrint("[Prop Chooser] You have reached the limit!")
+			return
+		end
+	
+		local pos = ply:GetPos()
+		--Temporarily Spawn a prop.
+		local ent = ents.Create("prop_physics")
+		ent:SetPos( Vector( pos.x, pos.y, pos.z-512 ) )
+		ent:SetAngles(Angle(0,0,0))
+		ent:SetKeyValue("spawnflags","654")
+		ent:SetNoDraw(true)
+		ent:SetModel(mdl)
+		
+		ent:Spawn()
+		
+		local usage = ply:CheckUsage()
+		local hmx,hz = ent:GetPropSize()
+		if !ply:CheckHull(hmx,hmx,hz) then
+			if usage > 0 then
+				ply:SendLua([[chat.AddText(Color(235,10,15), "[Prop Chooser]", Color(220,220,220), " There is no room to change the prop. Move a little a bit...")]])
+			end
+		else
+			if usage <= -1 then
+				GAMEMODE:PlayerExchangeProp(ply,ent)
+				PCR.NotifyPlayer( ply, "[Prop Chooser] You have **unlimitted** usage left!", "NOTIFY_UNDO" )
+			elseif usage > 0 then
+				ply:UsageSubstractCount()
+				GAMEMODE:PlayerExchangeProp(ply,ent)
+				PCR.NotifyPlayer( ply, "[Prop Chooser] You have " .. (usage - 1) .. " usage left!", "NOTIFY_GENERIC" )
+			end
+		end
+		ent:Remove()
+		
+		ply:SetNWFloat( "pcr.LastUsedTime", CurTime() )
+		
+	else
+	
+		ply:ChatPrint( "[Prop Chooser] Please wait in few seconds...!" )
+		
+	end
 end)
 
 -- Handles UI
 util.AddNetworkString("pcr.ShowUI")
 function PCR.KeyUp(ply,key)
-	if (IsValid(ply) && key == PCR.CVAR.DefaultKey:GetInt()) then
+	if ( IsValid(ply) and key == PCR.CVAR.DefaultKey:GetInt() and ply:Team() == TEAM_PROPS ) then
 		net.Start("pcr.ShowUI")
 		net.Send(ply)
 	end
 end
-hook.Add("PlayerButtonUp","PCR.PressedKey",function(ply, btn)
+hook.Add("PlayerButtonDown","PCR.PressedKey",function(ply, btn)
 	PCR.KeyUp(ply,btn)
 end)
 
-concommand.Add("pcr_debug_model_list",function(ply)
-	if ply:IsSuperAdmin() || ply:IsAdmin() then
-		PrintTable(PCR.PropList)
-	else
-		ply:ChatPrint("Sorry, you can not use this command.")
+hook.Add("PlayerSay", "pcr_ActivateTutorial", function( ply, text )
+	local str = string.lower(text)
+	
+	if str == "!pcrhelp" then
+		ply:SendLua("PCR.openTutorialWindow()")
 	end
+	return ""
 end)
