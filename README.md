@@ -4,14 +4,12 @@
 ## About
 
 Simple addons for Prop Hunt: Enhanced which allows you to choose any props from a map whenever you want!  
-Current Version: **1.2**
+Current Version: **1.3**
 
-Fixes on 1.2:
-- Removed some uneeded net Messages
-- Added delay to prevent Model-Changing Spam
-- Limit can be checked both in client and server-side
-- Added CVars
-- Other Improvements
+Fixes on 1.3:
+- Added Cvars for Room Checks and Notify Messages
+- Removed 'PlayerSay' hook and replaced with F1 Help Menu (F1, PropChooser menu in PH:E)
+- Added checks to make sure player did not use any banned props after ConVar "pcr_enable_prop_ban" was changed.
 
 ### How it Works
 
@@ -58,6 +56,8 @@ Twitter: https://twitter.com/vinzuerio  (*Questions only!*)
 #### New ConVars:
 - pcr_kick_invalid : Kick any user attempt to access invalid model that does not exists in current map/custom list with threshold 4x max attempts.
 - pcr_delay_use : Delay, in seconds before player able to use Prop Chooser in next N seconds. (default is 2) - This prevent spamming issues.
+- pcr_notify_messages : Notify client about how to use Prop Chooser?
+- pcr_use_room_check : Use Room check before a player use other (larger) object? Disable this if you're facing with 'there is no room to change' message.
 
 #### How to Add Custom Props & Adding Prop Bans?
 
