@@ -1,6 +1,8 @@
 PCR = {}
 PCR.__index = PCR
 
+PCR._VERSION = "1.3"
+
 PCR.BannedProp = {}
 PCR.CustomProp = {}
 
@@ -26,25 +28,39 @@ PCR.CVAR.DelayUsageTime = CreateConVar("pcr_delay_use", "2", 	  svonly, "Delay, 
 
 PCR.CVAR.DefaultKey		= CreateConVar("pcr_default_key_menu", KEY_F8, svonly, "Key that should be used to bring up the Prop Chooser Menu. Default is KEY_F8 (Decimal: 9).\nSee on this Wiki for buttons: https://wiki.garrysmod.com/page/Enums/BUTTON_CODE")
 
+PCR.CVAR.NotifyClient	= CreateConVar("pcr_notify_messages", 	"0", svonly, "Notify client about how to use Prop Chooser?")
+PCR.CVAR.RoomCheck		= CreateConVar("pcr_use_room_check", 	"0", svonly, "Use Room check before a player use other (larger) object? Disable this if you're facing with 'there is no room to change' message.")
+
 --Donate window
-PCR.CVAR.EnableDonationLink = CreateConVar("pcr_enable_about","1",	svonly,"Enable about window? It's okay to turn it off btw.")
+PCR.CVAR.EnableDonationLink = CreateConVar("pcr_enable_about","1",	svonly,"Enable about footer? It's okay to turn it off btw.")
 
 local ADDON_INFO = {
 	name	= "Prop Chooser",
-	version	= "1.2",
+	version	= PCR._VERSION,
 	info	= "Prop Chooser Addon. Press [F8] by default to open Prop Chooser.",
 	
 	settings = {
-		{"pcr_enable", "check", "SERVER", "Enable Prop Chooser Feature"},
+		{"", "label", false, "Common Settings" },
+		{"pcr_enable", "check", "SERVER", "Enable Prop Chooser feature"},
+		{"pcr_allow_custom", "check", "SERVER", "Allow custom prop to be included in to list?" },
+		{"pcr_enable_prop_ban", "check", "SERVER", "Do not include banned props into Prop Chooser list?" },
+		{"pcr_max_use" , "slider", {min = -1, max = 20, init = 3, dec = 0, kind = "SERVER"}, "Maximum usage limit for player use this feature. -1 means unlimited usage."},
+		{"pcr_max_enable", "check", "SERVER", "Limit addition to Prop Chooser list. (see 'pcr_max_prop_list' for how many models you'll needed.)"},
+		{"pcr_max_prop_list" , "slider", {min = 20, max = 2048, init = 100, dec = 0, kind = "SERVER"}, "Maximum number of props that will be listed into Prop Chooser list."},
+		
+		{"", "label", false, "Technical Settings" },
+		{"pcr_delay_use" , "slider", {min = 1, max = 10, init = 2, dec = 0, kind = "SERVER"}, "Delay in seconds before player use next Props in Prop Chooser menu."},
+		{"pcr_kick_invalid", "check", "SERVER", "Kick any user attempt to access Invalid Model (4x Maximum threshold)"},
+		{"pcr_use_room_check", "check", "SERVER", "Use room check before player use other objects?"},
+		
+		{"", "label", false, "Experimental" },
 		{"pcr_enable_bbox_limit", "check", "SERVER", "[!EXPERIMENTAL] Check Entity BBox Limit before adding to Prop Chooser list." },
-		{"pcr_bbox_max_height" , "slider", {min = 16, max = 256, init = 96, dec = 0, kind = "SERVER"}, "[!EXPERIMENTAL] BBOX CollissionBound Maximum Height Limit." },
-		{"pcr_bbox_max_width" , "slider", {min = 16, max = 256, init = 72, dec = 0, kind = "SERVER"}, "[!EXPERIMENTAL] BBOX CollissionBound Maximum Width Limit." },		
-		{"pcr_allow_custom", "check", "SERVER", "Allow custom prop to be added in the lists?" },
-		{"pcr_enable_prop_ban", "check", "SERVER", "Disallow some props before adding to the Prop Chooser lists?" },
-		{"pcr_max_enable", "check", "SERVER", "Enable limit into Maximum Prop Entries (see pcr_max_prop_list for how many props model you'll need to limit.)"},
-		{"pcr_max_prop_list" , "slider", {min = 20, max = 2048, init = 100, dec = 0, kind = "SERVER"}, "Maximum list that props will be listed."},
-		{"pcr_max_use" , "slider", {min = -1, max = 20, init = 3, dec = 0, kind = "SERVER"}, "Maximum usage limit. -1 means unlimited."},
-		{"pcr_enable_about", "check", "SERVER", "Enable about window?"}
+		{"pcr_bbox_max_height" , "slider", {min = 16, max = 256, init = 96, dec = 0, kind = "SERVER"}, "[!EXPERIMENTAL] BBox CollissionBound Maximum Height Limit." },
+		{"pcr_bbox_max_width" , "slider", {min = 16, max = 256, init = 72, dec = 0, kind = "SERVER"}, "[!EXPERIMENTAL] BBox CollissionBound Maximum Width Limit." },
+		
+		{"", "label", false, "Players" },
+		{"pcr_notify_messages", "check", "SERVER", "Notify a message on how to use Prop Chooser?"},
+		{"pcr_enable_about", "check", "SERVER", "Show credit footer?"}
 	},
 	
 	client	= {}

@@ -12,3 +12,9 @@ concommand.Add( "pcr_debug_model_list",function( ply )
 		end
 	end
 end)
+
+if (CLIENT) then
+	concommand.Add("pcr_help", function()
+		PCR.openTutorialWindow()
+	end)
+end

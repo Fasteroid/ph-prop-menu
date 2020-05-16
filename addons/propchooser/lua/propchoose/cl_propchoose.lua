@@ -7,9 +7,20 @@ net.Receive("pcr.PropListData", function()
 	end
 end)
 
-timer.Create("pcrT.NotifyAddon", math.random(70,120), math.random(4,10), function()
-	chat.AddText( Color(10,235,235), "[Prop Chooser]", Color(220,220,220), " This server uses Prop Chooser version 1.2! Type ", Color(235,235,0), "\"!pcrhelp\"" , Color(220,220,220), " for more info!" )
-end)
+if ( PCR.CVAR.NotifyClient:GetBool() ) then
+	timer.Create("pcrT.NotifyAddon", math.random(70,120), math.random(4,10), function()
+		chat.AddText( Color(10,235,235), "[Prop Chooser]", Color(220,220,220), " This server use Prop Chooser version ".. PCR._VERSION .."! Type ", Color(235,235,0), "\"pcr_help\"" , Color(220,220,220), " in console or use F1 -> [PropChooser Help] menu!" )
+	end)
+end
+
+-- Add 'PropChooser Help' menu on F1 selection screen.
+
+	hook.Add("PH_AddSplashHelpButton", "PCR.AddSplashScreen", function(helpUI)
+		local help = helpUI:AddSelectButton("PropChooser Help", function()
+			PCR.openTutorialWindow()
+		end)
+		help.m_colBackground = Color(165,100,235)
+	end)
 
 PCR.WindowControl = {}
 function PCR.WindowControl.MainFrame(ls)
@@ -150,7 +161,7 @@ function PCR.openTutorialWindow()
 	f.frame = vgui.Create("DFrame")
 	f.frame:SetPos(0,0)
 	f.frame:SetSize(970, 556)
-	f.frame:SetTitle("Prop Chooser - Quick Guide v.1.2")
+	f.frame:SetTitle("Prop Chooser - Quick Guide")
 	f.frame:SetVisible(true)
 	f.frame:ShowCloseButton(true)
 	f.frame:SetMouseInputEnabled(true)

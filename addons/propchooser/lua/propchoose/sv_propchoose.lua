@@ -166,12 +166,12 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 		
 		if ( PCR.CVAR.KickInvalidModel:GetBool() ) then
 			ply.warnInvalidModel = ply.warnInvalidModel + 1
-			ply:ChatPrint("That prop you have selected does not exists in the server map. (" ..tostring(ply.warnInvalidModel).. "/4).")
+			ply:ChatPrint("That prop you have selected does not exists in this map. (" ..tostring(ply.warnInvalidModel).. "/4).")
 			if ply.warnInvalidModel > 4 then
 				ply:Kick("[Prop Chooser] Kicked for Reason: trying to access invalid prop.")
 			end
 		else
-			ply:ChatPrint("That prop you have selected does not exists in the server map.")
+			ply:ChatPrint("That prop you have selected does not exists in this map.")
 		end
 		
 		return
@@ -180,6 +180,12 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 	-- Make sure that the player is On Ground and Not crouching.
 	if ( ply:Crouching() or (not ply:IsOnGround()) ) then
 		ply:ChatPrint("[Prop Chooser] You need to stay on the ground or not crouching!")
+		return
+	end
+	
+	-- Make sure player is not accessing banned prop
+	if ( PCR.CVAR.EnablePropBan:GetBool() and table.HasValue(PCR.BannedProp, string.lower(mdl)) ) then
+		ply:ChatPrint("[Prop Chooser] The prop you have selected was banned on the server.")
 		return
 	end
 	
@@ -203,7 +209,7 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 		
 		local usage = ply:CheckUsage()
 		local hmx,hz = ent:GetPropSize()
-		if !ply:CheckHull(hmx,hmx,hz) then
+		if ( PCR.CVAR.RoomCheck:GetBool() and (not ply:CheckHull(hmx,hmx,hz)) ) then
 			if usage > 0 then
 				ply:SendLua([[chat.AddText(Color(235,10,15), "[Prop Chooser]", Color(220,220,220), " There is no room to change the prop. Move a little a bit...")]])
 			end
@@ -238,13 +244,4 @@ function PCR.KeyUp(ply,key)
 end
 hook.Add("PlayerButtonDown","PCR.PressedKey",function(ply, btn)
 	PCR.KeyUp(ply,btn)
-end)
-
-hook.Add("PlayerSay", "pcr_ActivateTutorial", function( ply, text )
-	local str = string.lower(text)
-	
-	if str == "!pcrhelp" then
-		ply:SendLua("PCR.openTutorialWindow()")
-	end
-	return ""
 end)
