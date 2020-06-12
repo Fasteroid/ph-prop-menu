@@ -1,7 +1,7 @@
 PCR = {}
 PCR.__index = PCR
 
-PCR._VERSION = "1.3"
+PCR._VERSION = "1.4"
 
 PCR.BannedProp = {}
 PCR.CustomProp = {}
@@ -35,7 +35,7 @@ PCR.CVAR.RoomCheck		= CreateConVar("pcr_use_room_check", 	"0", svonly, "Use Room
 PCR.CVAR.EnableDonationLink = CreateConVar("pcr_enable_about","1",	svonly,"Enable about footer? It's okay to turn it off btw.")
 
 local ADDON_INFO = {
-	name	= "Prop Chooser",
+	name	= "Prop Chooser (Prop Menu)",
 	version	= PCR._VERSION,
 	info	= "Prop Chooser Addon. Press [F8] by default to open Prop Chooser.",
 	

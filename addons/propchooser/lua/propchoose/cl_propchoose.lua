@@ -14,13 +14,17 @@ if ( PCR.CVAR.NotifyClient:GetBool() ) then
 end
 
 -- Add 'PropChooser Help' menu on F1 selection screen.
-
-	hook.Add("PH_AddSplashHelpButton", "PCR.AddSplashScreen", function(helpUI)
-		local help = helpUI:AddSelectButton("PropChooser Help", function()
-			PCR.openTutorialWindow()
-		end)
-		help.m_colBackground = Color(165,100,235)
+hook.Add("PH_AddSplashHelpButton", "PCR.AddSplashScreen", function(helpUI)
+	local help = helpUI:AddSelectButton("PropChooser Help", function()
+		PCR.openTutorialWindow()
 	end)
+	help.m_colBackground = Color(165,100,235)
+end)
+
+local aboutAndUrls = {
+	{ icon = "icon16/heart.png" , 	url = "https://www.wolvindra.net/donate", caption = "  Support my Addons!", text = "Made by Wolvindra-Vinzuerio." },
+	{ icon = "icon16/bricks.png", 	url = "https://prophunt.wolvindra.net/plugins", caption = "  More plugins!", text = "Check out more PH:E Plugins!"}
+}
 
 PCR.WindowControl = {}
 function PCR.WindowControl.MainFrame(ls)
@@ -41,6 +45,7 @@ function PCR.WindowControl.MainFrame(ls)
 		if uselimit > 0 then str = tostring(uselimit) end
 		
 		local f = {}
+		local about = math.random(1,2)
 		
 		f.frame = vgui.Create("DFrame")
 		f.frame:SetPos(30,25)
@@ -121,16 +126,16 @@ function PCR.WindowControl.MainFrame(ls)
 			f.text:DockMargin(12,4,12,0)
 			f.text:SetFont("Trebuchet18")
 			f.text:SetColor(Color(0,0,0))
-			f.text:SetText("Made by Wolvindra-Vinzuerio.")
+			f.text:SetText(aboutAndUrls[about]["text"])
 			f.text:SetContentAlignment(4)
 			
 			f.button = vgui.Create("DButton",f.footer)
-			f.button:SetText("  Support my Addons!")
+			f.button:SetText(aboutAndUrls[about]["caption"])
 			f.button:SetPos(224,4)
 			f.button:SetSize(140,24)
-			f.button:SetIcon("icon16/heart.png")
+			f.button:SetIcon(aboutAndUrls[about]["icon"])
 			f.button.DoClick = function()
-				gui.OpenURL("https://www.wolvindra.net/donate")
+				gui.OpenURL(aboutAndUrls[about]["url"])
 				f.frame:Close()
 			end
 		end

@@ -4,7 +4,11 @@
 ## About
 
 Simple addons for Prop Hunt: Enhanced which allows you to choose any props from a map whenever you want!  
-Current Version: **1.3**
+Current Version: **1.4**
+
+Fixes on 1.4:
+- Removed Initialization Hook to prevent 'Plugins' not showing up on F1 menu.
+- Minor Improvements
 
 Fixes on 1.3:
 - Added Cvars for Room Checks and Notify Messages
@@ -35,9 +39,12 @@ This is perfect condition whenever you were feel attacked / found by selecting a
 Feel free to open a pull request in this repository, if you have any (better) suggestions!  
 I worked this nearly about 6 hours, pretty quickly because just wanted to make one. If you have a moment, feel free to contribute by supporting too!
 
-Support on Ko-fi: https://ko-fi.com/wolvyrra/  
-Support on Official Website: https://www.wolvindra.net/donate/  
-Twitter: https://twitter.com/vinzuerio  (*Questions only!*)
+Support me on Ko-fi: https://ko-fi.com/wolvyrra/  
+Support me on Official Website: https://www.wolvindra.net/donate/  
+
+**Questions?**  
+Twitter: https://twitter.com/vinzuerio (you can do via DM)  
+Discord: Wolvindra-Vinzuerio#4936
 
 ### How's about Customisation and/or configurations?
 
