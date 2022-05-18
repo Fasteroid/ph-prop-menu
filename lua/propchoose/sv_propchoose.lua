@@ -141,7 +141,6 @@ end)
 
 PCR.NotifyPlayer = function( ply , message , kind )
 	ply:SendLua("notification.AddLegacy(\"".. message .. "\", " .. kind .. ", 5)")
-	ply:SendLua("surface.PlaySound('garrysmod/save_load".. math.random(1,4) ..".wav')")
 end
 
 local function PlayerDelayCheck(ply)
@@ -171,7 +170,7 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 				ply:Kick("[Prop Chooser] Kicked for Reason: trying to access invalid prop.")
 			end
 		else
-			ply:ChatPrint("That prop you have selected does not exists in this map.")
+			ply:ChatPrint("[Prop Chooser] Sorry, that model doesn't exist on this map! (are you trying to cheat?)")
 		end
 		
 		return
@@ -185,7 +184,7 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 	
 	-- Make sure player is not accessing banned prop
 	if ( PCR.CVAR.EnablePropBan:GetBool() and table.HasValue(PCR.BannedProp, string.lower(mdl)) ) then
-		ply:ChatPrint("[Prop Chooser] The prop you have selected was banned on the server.")
+		ply:ChatPrint("[Prop Chooser] Sorry, that prop is banned on this server.")
 		return
 	end
 	
@@ -229,7 +228,7 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 		
 	else
 	
-		ply:ChatPrint( "[Prop Chooser] Please wait in few seconds...!" )
+		ply:ChatPrint( "[Prop Chooser] You just changed props, please wait a moment." )
 		
 	end
 end)
