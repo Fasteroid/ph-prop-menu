@@ -176,11 +176,12 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 		return
 	end
 	
-	-- Make sure that the player is On Ground and Not crouching.
+	--[[ Make sure that the player is On Ground and Not crouching.
 	if ( ply:Crouching() or (not ply:IsOnGround()) ) then
 		ply:ChatPrint("[Prop Chooser] You need to stay on the ground or not crouching!")
 		return
 	end
+	]]-- this check is stupid, removing it for now until someone finds a problem with it
 	
 	-- Make sure player is not accessing banned prop
 	if ( PCR.CVAR.EnablePropBan:GetBool() and table.HasValue(PCR.BannedProp, string.lower(mdl)) ) then
@@ -234,6 +235,7 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 end)
 
 -- Handles UI
+-- wtf why is this on server lol
 util.AddNetworkString("pcr.ShowUI")
 function PCR.KeyUp(ply,key)
 	if ( IsValid(ply) and key == PCR.CVAR.DefaultKey:GetInt() and ply:Team() == TEAM_PROPS ) then
