@@ -21,11 +21,6 @@ hook.Add("PH_AddSplashHelpButton", "PCR.AddSplashScreen", function(helpUI)
 	help.m_colBackground = Color(165,100,235)
 end)
 
-local aboutAndUrls = {
-	{ icon = "icon16/heart.png" , 	url = "https://www.wolvindra.net/donate", caption = "  Support my Addons!", text = "Made by Wolvindra-Vinzuerio." },
-	{ icon = "icon16/bricks.png", 	url = "https://prophunt.wolvindra.net/plugins", caption = "  More plugins!", text = "Check out more PH:E Plugins!"}
-}
-
 PCR.WindowControl = {}
 function PCR.WindowControl.MainFrame(ls)
 	if !PCR.CVAR.EnableFeature:GetBool() then
@@ -45,7 +40,6 @@ function PCR.WindowControl.MainFrame(ls)
 		if uselimit > 0 then str = tostring(uselimit) end
 		
 		local f = {}
-		local about = math.random(1,2)
 		
 		f.frame = vgui.Create("DFrame")
 		f.frame:SetPos(30,25)
@@ -70,9 +64,8 @@ function PCR.WindowControl.MainFrame(ls)
 		local font2 = "HudHintTextLarge"
 		f.panel.PaintOver = function(self,w,h)
 			surface.SetFont(font)
-			draw.DrawText("Select any prop you want. You have",font2,w/2,h/2-32,Color(200,200,200),TEXT_ALIGN_CENTER)
-			draw.DrawText(str.." usage limit",font,w/2,h/2-16,Color(255,255,30),TEXT_ALIGN_CENTER)
-			draw.DrawText("to use this prop chooser!",font2,w/2,h/2+12,Color(200,200,200),TEXT_ALIGN_CENTER)
+			draw.DrawText("Select any prop you want. You have",font2,w/2,h/2-18,Color(200,200,200),TEXT_ALIGN_CENTER)
+			draw.DrawText(str.." uses remaining!",font,w/2,h/2-4,Color(255,255,30),TEXT_ALIGN_CENTER)
 		end
 		
 		-- body panel --
@@ -112,34 +105,6 @@ function PCR.WindowControl.MainFrame(ls)
 			f.grid:AddItem(pan)
 		end
 		
-		-- footer panel --
-		if PCR.CVAR.EnableDonationLink:GetBool() then
-			f.footer = vgui.Create("DPanel",f.frame)
-			f.footer:Dock(BOTTOM)
-			f.footer:SetSize(0,32)
-			f.footer:DockMargin(8,0,8,4)
-			
-			-- footer container --
-			f.text = vgui.Create("DLabel",f.footer)
-			f.text:Dock(TOP)
-			f.text:SetSize(0,f.footer:GetTall()/2+8)
-			f.text:DockMargin(12,4,12,0)
-			f.text:SetFont("Trebuchet18")
-			f.text:SetColor(Color(0,0,0))
-			f.text:SetText(aboutAndUrls[about]["text"])
-			f.text:SetContentAlignment(4)
-			
-			f.button = vgui.Create("DButton",f.footer)
-			f.button:SetText(aboutAndUrls[about]["caption"])
-			f.button:SetPos(224,4)
-			f.button:SetSize(140,24)
-			f.button:SetIcon(aboutAndUrls[about]["icon"])
-			f.button.DoClick = function()
-				gui.OpenURL(aboutAndUrls[about]["url"])
-				f.frame:Close()
-			end
-		end
-		
 		f.frame:MakePopup()
 		f.frame:SetKeyboardInputEnabled(false)
 	else
@@ -153,10 +118,12 @@ function PCR.AddProps()
 	PCR.WindowControl.MainFrame(PCR.PropList)
 end
 
-concommand.Add("phe_access_propchoose", PCR.AddProps)
+concommand.Add( "phe_access_propchoose", PCR.AddProps )
 
-net.Receive("pcr.ShowUI", function()
-	PCR.AddProps()
+hook.Add("PlayerButtonDown","PH:Infinity.Propchoose", function(ply, key)
+    if not IsFirstTimePredicted() then return end -- stupid hook
+    if key ~= KEY_F4 then return end
+    RunConsoleCommand("phe_access_propchoose")
 end)
 
 function PCR.openTutorialWindow()

@@ -233,16 +233,3 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 		
 	end
 end)
-
--- Handles UI
--- wtf why is this on server lol
-util.AddNetworkString("pcr.ShowUI")
-function PCR.KeyUp(ply,key)
-	if ( IsValid(ply) and key == PCR.CVAR.DefaultKey:GetInt() and ply:Team() == TEAM_PROPS ) then
-		net.Start("pcr.ShowUI")
-		net.Send(ply)
-	end
-end
-hook.Add("PlayerButtonDown","PCR.PressedKey",function(ply, btn)
-	PCR.KeyUp(ply,btn)
-end)

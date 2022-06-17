@@ -26,8 +26,6 @@ PCR.CVAR.UseLimit		= CreateConVar("pcr_max_use","3",			svonly, "Maximum usage li
 PCR.CVAR.KickInvalidModel = CreateConVar("pcr_kick_invalid", "1", svonly, "Kick any user attempt to access invalid model that does not exists in current map/custom list with threshold 4x max attempts.")
 PCR.CVAR.DelayUsageTime = CreateConVar("pcr_delay_use", "2", 	  svonly, "Delay, in seconds before player able to use Prop Chooser in next N seconds. (default is 2) - This prevent spamming issues.")
 
-PCR.CVAR.DefaultKey		= CreateConVar("pcr_default_key_menu", KEY_Q, svonly, "Key that should be used to bring up the Prop Chooser Menu. Default is KEY_Q.\nSee on this Wiki for buttons: https://wiki.garrysmod.com/page/Enums/BUTTON_CODE")
-
 PCR.CVAR.NotifyClient	= CreateConVar("pcr_notify_messages", 	"0", svonly, "Notify client about how to use Prop Chooser?")
 PCR.CVAR.RoomCheck		= CreateConVar("pcr_use_room_check", 	"0", svonly, "Use Room check before a player use other (larger) object? Disable this if you're facing with 'there is no room to change' message.")
 
