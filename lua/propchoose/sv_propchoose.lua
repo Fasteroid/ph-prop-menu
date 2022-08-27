@@ -190,9 +190,11 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 	end
 	
 	if ( IsValid(ply) and (not PlayerDelayCheck(ply)) ) then
+
+		local usage = ply:CheckUsage()
 	
-		if ply:CheckUsage() == 0 then
-			ply:ChatPrint("[Prop Chooser] You have reached the limit!")
+		if usage == 0 then
+			ply:ChatPrint("[Prop Chooser] Out of uses, sorry...") -- TODO: prevent even opening the menu if out of uses
 			return
 		end
 	
@@ -207,12 +209,10 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 		
 		ent:Spawn()
 		
-		local usage = ply:CheckUsage()
+
 		local hmx,hz = ent:GetPropSize()
-		if ( PCR.CVAR.RoomCheck:GetBool() and (not ply:CheckHull(hmx,hmx,hz)) ) then
-			if usage > 0 then
-				ply:SendLua([[chat.AddText(Color(235,10,15), "[Prop Chooser]", Color(220,220,220), " There is no room to change the prop. Move a little a bit...")]])
-			end
+		if ( not ply.UnstuckData.free ) then
+			PCR.NotifyPlayer( ply, "[Prop Chooser] Can't change while stuck; use !unstuck first.", "NOTIFY_ERROR" )
 		else
 			if usage <= -1 then
 				GAMEMODE:PlayerExchangeProp(ply,ent)
@@ -220,7 +220,7 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 			elseif usage > 0 then
 				ply:UsageSubstractCount()
 				GAMEMODE:PlayerExchangeProp(ply,ent)
-				PCR.NotifyPlayer( ply, "[Prop Chooser] You have " .. (usage - 1) .. " usage left!", "NOTIFY_GENERIC" )
+				PCR.NotifyPlayer( ply, "[Prop Chooser] You have " .. (usage - 1) .. " uses left!", "NOTIFY_GENERIC" )
 			end
 		end
 		ent:Remove()
