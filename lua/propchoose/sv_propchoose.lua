@@ -211,7 +211,7 @@ net.Receive("pcr.SetMetheProp",function(len,ply)
 		
 
 		local hmx,hz = ent:GetPropSize()
-		if ( not ply.UnstuckData.free ) then
+		if ( not ply.UnstuckData.isFree ) then
 			PCR.NotifyPlayer( ply, "[Prop Chooser] Can't change while stuck; use !unstuck first.", "NOTIFY_ERROR" )
 		else
 			if usage <= -1 then
